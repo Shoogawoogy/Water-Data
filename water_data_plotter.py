@@ -290,7 +290,7 @@ class WaterDataPlotterYearCompare:
     def plot_data(self):
         """
         Plot the reduced data for one or two years on the same figure but in different subplots.
-        Display datetime labels only for the bottom graph if there are two graphs.
+        Trendlines will plot from minimum to maximum depth values instead of average.
         """
         # Create a figure with subplots
         fig, axes = plt.subplots(2 if self.year2 else 1, 1, figsize=(10, 12))  # Two subplots if year2 is provided
@@ -300,8 +300,10 @@ class WaterDataPlotterYearCompare:
         dates_reduced1, depths_reduced1 = self.reduce_resolution(filtered_dates1, filtered_depths1)
         dates_numeric1 = mdates.date2num(dates_reduced1)
 
-        # Calculate the trendline for the first year
-        trendline_coeffs1 = np.polyfit(dates_numeric1, depths_reduced1, 1)
+        # Calculate the trendline for the first year (minimum to maximum depth)
+        min_depth1 = min(depths_reduced1)
+        max_depth1 = max(depths_reduced1)
+        trendline_coeffs1 = np.polyfit([dates_numeric1[0], dates_numeric1[-1]], [min_depth1, max_depth1], 1)
         trendline1 = np.poly1d(trendline_coeffs1)
         slope1 = trendline_coeffs1[0]
         intercept1 = trendline_coeffs1[1]
@@ -309,7 +311,7 @@ class WaterDataPlotterYearCompare:
 
         # Plot the first year's data
         axes[0].plot(dates_reduced1, depths_reduced1, marker='o', linestyle='-', color='b', label=f'{self.year1} Depth to Water Level')
-        axes[0].plot(dates_reduced1, trendline1(dates_numeric1), color='r', linestyle='--', label=f'{self.year1} Trendline')
+        axes[0].plot(dates_reduced1, trendline1(dates_numeric1), color='r', linestyle='--', label=f'{self.year1} Trendline (Min to Max)')
         axes[0].text(0.05, 0.95, equation1, transform=axes[0].transAxes, fontsize=12, color='red', verticalalignment='top')
         axes[0].set_title(f"Depth to Water Level Over Time ({self.year1})", fontsize=16)
         axes[0].set_ylabel("Depth (ft)", fontsize=14)
@@ -328,8 +330,10 @@ class WaterDataPlotterYearCompare:
             dates_reduced2, depths_reduced2 = self.reduce_resolution(filtered_dates2, filtered_depths2)
             dates_numeric2 = mdates.date2num(dates_reduced2)
 
-            # Calculate the trendline for the second year
-            trendline_coeffs2 = np.polyfit(dates_numeric2, depths_reduced2, 1)
+            # Calculate the trendline for the second year (minimum to maximum depth)
+            min_depth2 = min(depths_reduced2)
+            max_depth2 = max(depths_reduced2)
+            trendline_coeffs2 = np.polyfit([dates_numeric2[0], dates_numeric2[-1]], [min_depth2, max_depth2], 1)
             trendline2 = np.poly1d(trendline_coeffs2)
             slope2 = trendline_coeffs2[0]
             intercept2 = trendline_coeffs2[1]
@@ -337,7 +341,7 @@ class WaterDataPlotterYearCompare:
 
             # Plot the second year's data
             axes[1].plot(dates_reduced2, depths_reduced2, marker='o', linestyle='-', color='g', label=f'{self.year2} Depth to Water Level')
-            axes[1].plot(dates_reduced2, trendline2(dates_numeric2), color='orange', linestyle='--', label=f'{self.year2} Trendline')
+            axes[1].plot(dates_reduced2, trendline2(dates_numeric2), color='orange', linestyle='--', label=f'{self.year2} Trendline (Min to Max)')
             axes[1].text(0.05, 0.95, equation2, transform=axes[1].transAxes, fontsize=12, color='orange', verticalalignment='top')
             axes[1].set_title(f"Depth to Water Level Over Time ({self.year2})", fontsize=16)
             axes[1].set_xlabel("Datetime", fontsize=14)
